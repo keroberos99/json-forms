@@ -2,11 +2,12 @@
 <html>
     <head>
         <meta name=viewport content='width=560'>
+        <link rel="stylesheet" href='lib/jquery-ui-1.12.1/jquery-ui.min.css'/>
         <link rel="stylesheet" href='lib/bootstrap/css/bootstrap.min.css'/>
         <link rel="stylesheet" href="lib/codemirror/codemirror.css">
         <link rel="stylesheet" href="lib/bootstrap-select/css/bootstrap-select.min.css">
         <link rel="stylesheet" href="lib/octicons/octicons.css">
-        <link rel="stylesheet" href='//rawgit.com/brutusin/json-forms/master/dist/css/brutusin-json-forms.min.css'/>
+        <link rel="stylesheet" href='//rawgit.com/keroberos99/json-forms/master/dist/css/brutusin-json-forms.min.css'/>
 
         <style>
             img {
@@ -18,17 +19,15 @@
         </style>
 
         <script src='lib/jquery-1.11.3.min.js'></script>
+        <script src='lib/jquery-ui-1.12.1/jquery-ui.min.js'></script>
         <script src='lib/bootstrap/js/bootstrap.min.js'></script>
         <script src="lib/codemirror/codemirror.js"></script>
         <script src="lib/codemirror/codemirror-javascript.js"></script>
         <script src="lib/markdown.min.js"></script>
         <script src="lib/bootstrap-select/js/bootstrap-select.min.js"></script>
         <script src="lib/bootstrap-select/js/i18n/defaults-en_US.min.js"></script>
-        <!--
-        <script src="//rawgit.com/brutusin/json-forms/master/dist/js/brutusin-json-forms.min.js"></script>
-         -->
-        <script src="//rawgit.com/brutusin/json-forms/master/src/js/brutusin-json-forms.js"></script>
-        <script src="//rawgit.com/brutusin/json-forms/master/dist/js/brutusin-json-forms-bootstrap.min.js"></script>
+        <script src="//rawgit.com/keroberos99/json-forms/master/src/js/brutusin-json-forms.js"></script>
+        <script src="//rawgit.com/keroberos99/json-forms/master/dist/js/brutusin-json-forms-bootstrap.min.js"></script>
         <script lang="javascript">
             var BrutusinForms = brutusin["json-forms"];
             BrutusinForms.bootstrap.addFormatDecorator("inputstream", "file", "glyphicon-search", function (element) {
@@ -44,10 +43,15 @@
             var selectedDemo;
             var demos = [
                 ["Dynamic schemas",
-                    {"$schema": "http://json-schema.org/draft-03/schema#", "type": "object", "properties": {"species": {"title": "Species supported", "description": "Changes in this property (`$.species`) trigger the resolution of the actual (depending on the values being selected) schema of a dependent property (`$.subspecies`)", "type": "string", "enum": ["human", "dog", "cat"], "required": true}, "subspecies": {"dependsOn": ["species"]}}},
+                    {"$schema":"http://json-schema.org/draft-03/schema#","type":"object","properties":{"Race":{"title":"Race of Hero","type":"string","enum":["Zerg","Protos","Human"],"required":true},"character":{"type":"object","properties":{"ability":{"title":"Ability","type":"string","enum":["heal","agile","assasin","thift"],"required":true},"artifact":{"dependsOn":["ability" /* Schema will read ability to generate type for artifact. */ ]},"career":{"description":"Changes in this property (`$.character.career`) trigger the resolution of the actual (depending on the values being selected) schema of a dependent property (`$.character.weapon`)","type":"string","enum":["mage","kight","archer"],"required":true},"weapon":{"dependsOn":["career"]}}}}},
                     null,
-                    "function (names, data, cb) {\n    var schemas = new Object();\n    var schema = new Object();\n    if (data.species === \"human\") {\n        schema.type = \"null\"; // no such property for humans\n    } else {\n        schema.type = \"string\";\n        if (data.species === \"dog\") {\n            schema.title = \"Dog breed\";\n            schema.enum = [\"bulldog\", \"labrador\"]\n        } else {\n            schema.title = \"Cat breed\";\n            schema.enum = [\"siamese\", \"persian\"]\n        }\n    }\n    schemas[\"$.subspecies\"] = schema;\n    setTimeout(function(){cb(schemas)},500); // in order to show asynchrony\n}",
+                    "function (names, data, cb) {\r\n    var schemas = new Object();\r\n    var schema = new Object();\r\n  \r\n  \t\/\/This block can be replaced to ask schema from server instead.\r\n  \t\/\/[begin]\r\n  \r\n  \tif(names[0] === \"$.character.artifact\") {\r\n      if(data.character.ability === \"heal\") {\r\n        schema.type = \"string\";\r\n        schema.title = \"Heal Artifact\";\r\n        schema.enum = [\"wand\", \"orb\", \"medic kit\"];\r\n      } else \r\n      if(data.character.ability === \"agile\") {\r\n        schema.type = \"string\";\r\n        schema.title = \"Boot Artifact\";\r\n        schema.enum = [\"nike\", \"ardidas\", \"bata\"];\r\n      } else {\r\n      \tschema.type = null;\t\/\/No support artifact\r\n      }\r\n      schemas[names] = schema;\r\n    }\r\n  \r\n  \tif(names[0] === \"$.character.weapon\") {\r\n      if(data.character.career === \"mage\") {\r\n        schema.type = \"string\";\r\n        schema.title = \"Magic Weapon\";\r\n        schema.enum = [\"fire-wand\", \"ice-wand\", \"spark-wand\"];\r\n      } else \r\n      if(data.character.career === \"kight\") {\r\n        schema.type = \"string\";\r\n        schema.title = \"Night Weapon\";\r\n        schema.enum = [\"crystal-sword\", \"ruby-dagger\", \"emeral-dagger\"];\r\n      } else \r\n      if(data.character.career === \"archer\") {\r\n        schema.type = \"string\";\r\n        schema.title = \"Archer Weapon\";\r\n        schema.enum = [\"Vampire-Bow\", \"Light-Bow\", \"Soul-Bow\"];\r\n      } else {\r\n      \tschema.type = null;\t\/\/No support artifact\r\n      }\r\n      schemas[names] = schema;\r\n    }\r\n  \t\/\/[end]\r\n  \r\n  \t\/\/cb(schemas);\r\n    setTimeout(function(){cb(schemas)},500); \/\/ in order to show asynchrony\r\n}",
                     "Example of [dynamic schemas](https://github.com/brutusin/json-forms#dynamic-schemas) in action. Notice the usage of `dependsOn` (*Schema* tab), and the specific implementation of `bf.schemaResolver` (*Schema resolver* tab). See a real application of this feature at [http://demo.rpc.brutusin.org/rpc/repo/#http-services/logo](http://demo.rpc.brutusin.org/rpc/repo/#http-services/logo)"],
+				["Custom schemas",
+                    {"$schema":"http://json-schema.org/draft-03/schema#","definitions":{"person":{"$id":"#person","type":"object","properties":{"name":{"type":"string","default":"default name"},"age":{"type":"number"},"date_of_birth":{"type":"string","label":"Date of birth","default":"1970-01-01"}},"required":["street_address","city","state"]},"person2":{"type":"object","properties":{"name2":{"type":"string","default":"default name"},"age2":{"type":"number"},"date_of_birth2":{"type":"string","format":"date","label":"Date of birth 2","default":"1970-01-01"}},"required":["street_address","city","state"]}},"type":"object","properties":{"sample1":{"type":"string"},"sample2":{"type":"string","readOnly":true},"array-table-layout":{"type":"array","format":"table","items":{"$ref":"#/definitions/person"}},"array-readonly":{"type":"array","items":{"type":"string"},"readOnly":true},"array-default-layout":{"type":"array","items":{"$ref":"#/definitions/person2"}}}},
+                    null,
+                    null,
+                    "Example by Keroberos99"],
                 ["Simple",
                     {"$schema": "http://json-schema.org/draft-03/schema#", "title": "A boolean", "description": "A simple boolean data type as schema root", "type": "boolean"},
                     null,
@@ -200,14 +204,14 @@
 
     </head>
     <body>
-        <a href="https://github.com/brutusin/json-forms/tree/gh-pages"><img style="position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px;" src="img/forkme.png" alt="Fork me on GitHub"></a>
+        <a href="https://github.com/keroberos99/json-forms/tree/master"><img style="position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px;" src="img/forkme.png" alt="Fork me on GitHub"></a>
         <div class="container" >
             <h1><img alt="Butusin" src="https://avatars0.githubusercontent.com/u/10341159?v=3&s=200" style="border: 0; width: 50px; height: 50px;"/><code>brutusin:json-forms</code> demo</h1>
 
             <blockquote>
-                <p><b>JSON Schema to HTML form generator</b>, supporting dynamic subschemas (on the fly resolution). Extensible and customizable library with zero dependencies. Bootstrap add-ons provided.</p> 
-                <p>Source code and documentation available at <a href="https://github.com/brutusin/json-forms"><span class="octicon octicon-logo-github"></span></a></p>
-                <p>Originally created for <a href="http://rpc.brutusin.org">Brutusin-RPC</a>. See who else is using it <a href="https://github.com/brutusin/json-forms/blob/master/WHO-IS-USING.md">here</a>.</p>
+                <p><b>JSON Schema to HTML form generator </b>, fork by Keroberos99 to support more layout to present form.</p> 
+                <p>Source code and documentation are available at <a href="https://github.com/keroberos99/json-forms"><span class="octicon octicon-logo-github"></span></a></p>
+                <p>Original project is <a href="https://github.com/brutusin/json-forms">here</a>.</p>
             </blockquote>
             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                 <div class="panel panel-primary">
@@ -269,7 +273,18 @@
                                     }">validate()</button>
                         </div>
                     </div>
+					
+                    <div class="panel" role="tabpanel" aria-labelledby="headingTree">
+                        <div class="panel-footer">
+							<div class="alert alert-info" role="alert">
+								<strong>Wait to invoke jQuery for transform input style</strong>
+								<div>this code does not invoke jQuery immediate and let you see original input tag render and let you invoke for transform to see difference.</div>
+							</div>
+                            <button class="btn btn-primary" onclick="doTransform()">Transform to JqueryUI</button>
+                        </div>
+                    </div>
                 </div>
+				
             </div>
         </div>
 
@@ -298,6 +313,22 @@
                 codeMirrors[selectedTab].setValue(inputString[selectedTab]);
             }
             );
+			
+			
+			
+			function doTransform() {
+				var allMatch;
+
+				allMatch = $("input[type=date]");
+				allMatch.attr("type", "string");
+				allMatch.datepicker();
+			}
+			
+			$(window).on('brutusin-json-form-rendered', function (e) {
+				console.log('brutusin-json-form-rendered', e.originalEvent.detail);
+					doTransform();
+				
+			});
 
         </script>
     </div>

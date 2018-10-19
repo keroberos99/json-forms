@@ -109,6 +109,7 @@ if (typeof brutusin === "undefined") {
     BrutusinForms.onValidationSuccess = function (element) {
         element.className = element.className.replace(" error", "");
     };
+	
 
     /**
      * Callback function to be notified after a form has been rendered (passed as parameter).
@@ -177,7 +178,6 @@ if (typeof brutusin === "undefined") {
             } else if (s.media) {
                 input = document.createElement("input");
                 input.type = "file";
-                appendChild(input, option, s);
                 // XXX TODO, encode the SOB properly.
             } else if (s.enum) {
                 input = document.createElement("select");
@@ -205,7 +205,7 @@ if (typeof brutusin === "undefined") {
                     }
                 }
                 if (s.enum.length === 1)
-                    input.selectedIndex = 1;
+                    input.selectedIndex = 0;
                 else
                     input.selectedIndex = selectedIndex;
             } else {
@@ -223,6 +223,10 @@ if (typeof brutusin === "undefined") {
                         // #46, problem in IE11. TODO polyfill?
                         input.type = "text";
                     }
+                } else if (s.format === "date") {
+                    input.type = "date";
+                } else if (s.format === "time") {
+                    input.type = "time";
                 } else if (s.format === "email") {
                     input.type = "email";
                 } else if (s.format === "text") {
@@ -345,8 +349,8 @@ if (typeof brutusin === "undefined") {
             if (s.required) {
                 input = document.createElement("input");
                 input.type = "checkbox";
-                if (value === true) {
-                    input.checked = true;
+                if (value === true || value !== false && s.default) {
+                    input.checked = true;    
                 }
             } else {
                 input = document.createElement("select");
@@ -677,7 +681,7 @@ if (typeof brutusin === "undefined") {
             }
         };
         // end of object renderer
-        renderers["array"] = function (container, id, parentObject, propertyProvider, value) {
+		renderers["array-default-layout"] = function (container, id, parentObject, propertyProvider, value) {
             function addItem(current, table, id, value, readOnly) {
                 var schemaId = getSchemaId(id);
                 var s = getSchema(schemaId);
@@ -747,6 +751,7 @@ if (typeof brutusin === "undefined") {
             if (s.readOnly)
                 addButton.disabled = true;
             addButton.setAttribute('type', 'button');
+            addButton.className = "addItem";
             addButton.getValidationError = function () {
                 if (s.minItems && s.minItems > table.rows.length) {
                     return BrutusinForms.messages["minItems"].format(s.minItems);
@@ -779,6 +784,181 @@ if (typeof brutusin === "undefined") {
                 }
             }
             appendChild(container, div, s);
+        };
+		renderers["array-table-layout"] = function (container, id, parentObject, propertyProvider, value) {
+
+            function addItem(current, table, id, value, readOnly) {
+                var schemaId = getSchemaId(id);
+                var s = getSchema(schemaId);
+                var tbody = table.getElementsByTagName("tbody")[0];
+				if(!tbody) {
+					tbody = document.createElement("tbody");
+				}
+                var tr = document.createElement("tr");
+                tr.className = "item";
+                var td1 = document.createElement("td");
+                td1.className = "item-index";
+                var td2 = document.createElement("td");
+                td2.className = "item-action";
+				
+				var number = document.createTextNode(table.rows.length);
+                appendChild(td1, number, s);
+                appendChild(tr, td1, s);
+                appendChild(tr, td2, s);
+				//appendChild(tr, tdN, s);
+                appendChild(tbody, tr, s);
+                appendChild(table, tbody, s);
+				
+				
+				if (s.hasOwnProperty("properties")) {
+					//// Call as addItem(current, table, id + "[" + i + "]", value[i], s.readOnly);
+					for (var prop in itemS.properties) {								//property(value) columns
+						if (itemS.properties.hasOwnProperty(prop)) {
+							var td_n = document.createElement("td");
+							td_n.className = "item-value";
+							
+							var propId = id + "." + prop;
+							var propSchema = getSchema(getSchemaId(propId));
+							
+							td_n.innerHTML = k;
+							appendChild(tr, td_n, s);
+							
+							var pp = createPropertyProvider(function () {
+								return tr.rowIndex;
+							});
+							//var pp = createStaticPropertyProvider(prop);
+							var propInitialValue = null;
+							if (value) {
+								propInitialValue = value[prop];
+							}
+							render(null, td_n, propId, current, pp, propInitialValue);
+						}
+					}
+				} else {
+					render(null, td_n, id, current, pp, value);
+				}
+				
+				
+                var removeButton = document.createElement("button");
+                removeButton.setAttribute('type', 'button');
+                removeButton.className = "remove";
+                if (readOnly === true)
+                    removeButton.disabled = true;
+                appendChild(removeButton, document.createTextNode("x"), s);
+                var computRowCount = function () {
+                    for (var i = 0; i < table.rows.length; i++) {
+                        var row = table.rows[i];
+                        row.cells[0].innerHTML = i + 1;
+                    }
+                };
+                removeButton.onclick = function () {
+                    current.splice(tr.rowIndex, 1);
+                    table.deleteRow(tr.rowIndex);
+                    computRowCount();
+                };
+                appendChild(td2, removeButton, s);
+				
+				
+                
+            }
+
+            var schemaId = getSchemaId(id);
+            var s = getSchema(schemaId);
+            var itemS = getSchema(s.items);
+            var current = new Array();
+            if (!parentObject) {
+                data = current;
+            } else {
+                if (propertyProvider.getValue() || propertyProvider.getValue() === 0) {
+                    parentObject[propertyProvider.getValue()] = current;
+                }
+            }
+            if (propertyProvider) {
+                propertyProvider.onchange = function (oldPropertyName) {
+                    delete parentObject[oldPropertyName];
+                    parentObject[propertyProvider.getValue()] = current;
+                };
+            }
+            var div = document.createElement("div");
+            var table = document.createElement("table");
+			var thead = document.createElement("thead");
+			var tr_h = document.createElement("tr");
+			
+			var td_h_1 = document.createElement("td");
+            td_h_1.className = "label-item-index";
+			var td_h_2 = document.createElement("td");
+            td_h_2.className = "label-item-action";
+			appendChild(tr_h, td_h_1, s);									//index column
+			appendChild(tr_h,td_h_2, s);									//action column
+			for (var k in itemS.properties) {								//property(value) columns
+				if (itemS.properties.hasOwnProperty(k)) {
+					var td_h = document.createElement("td");
+					var propSchema = getSchema(itemS.$id + "." + k)
+					td_h.className = "label-item-value";
+					renderTitle(td_h, k, propSchema);
+					appendChild(tr_h, td_h, propSchema);
+				}
+			}
+			appendChild(thead, tr_h, s);
+			appendChild(table, thead, s);
+			
+            table.className = "array";
+            appendChild(div, table, s);
+            appendChild(container, div, s);
+            var addButton = document.createElement("button");
+            if (s.readOnly)
+                addButton.disabled = true;
+            addButton.setAttribute('type', 'button');
+            addButton.className = "addItem";
+            addButton.getValidationError = function () {
+                if (s.minItems && s.minItems > table.rows.length) {
+                    return BrutusinForms.messages["minItems"].format(s.minItems);
+                }
+                if (s.maxItems && s.maxItems < table.rows.length) {
+                    return BrutusinForms.messages["maxItems"].format(s.maxItems);
+                }
+                if (s.uniqueItems) {
+                    for (var i = 0; i < current.length; i++) {
+                        for (var j = i + 1; j < current.length; j++) {
+                            if (JSON.stringify(current[i]) === JSON.stringify(current[j])) {
+                                return BrutusinForms.messages["uniqueItems"];
+                            }
+                        }
+                    }
+                }
+            };
+            addButton.onclick = function () {
+                addItem(current, table, id + "[#]", null);
+            };
+            if (itemS.description) {
+                addButton.title = itemS.description;
+            }
+            appendChild(addButton, document.createTextNode(BrutusinForms.messages["addItem"]), s);
+            appendChild(div, table, s);
+            appendChild(div, addButton, s);
+            if (value && value instanceof Array) {
+                for (var i = 0; i < value.length; i++) {
+                    addItem(current, table, id + "[" + i + "]", value[i], s.readOnly);
+                }
+            }
+            appendChild(container, div, s);
+        };
+        renderers["array"] = function (container, id, parentObject, propertyProvider, value) {
+			
+			var schemaId = getSchemaId(id);
+            var s = getSchema(schemaId);
+			
+			if(s.format) {
+				var array_format_key = "array-"+s.format+"-layout";
+				if(renderers[array_format_key]) {
+					renderers[array_format_key](container, id, parentObject, propertyProvider, value);
+				} else {
+					console.error("Unsupport array format ["+s.format+"], use default format for array renderer.");
+					renderers["array-default-layout"](container, id, parentObject, propertyProvider, value);
+				}
+			} else {
+				renderers["array-default-layout"](container, id, parentObject, propertyProvider, value);
+			}
         };
         // end of array render
         /**
@@ -827,8 +1007,8 @@ if (typeof brutusin === "undefined") {
 
         obj.getData = function () {
             function removeEmptiesAndNulls(object, s) {
-                if (ss === null) {
-                    ss = SCHEMA_ANY;
+                if (s === null) {
+                    s = SCHEMA_ANY;
                 }
                 if (s.$ref) {
                     s = getDefinition(s.$ref);
@@ -1221,6 +1401,19 @@ if (typeof brutusin === "undefined") {
                     obj.schemaResolver([id], obj.getData(), cb);
                 }
             }
+			
+			if(titleContainer === null) {
+				//High posibility to be original call for render schema.
+				var evt = new CustomEvent('brutusin-json-form-rendered', 
+															{ 
+																detail: {
+																	titleContainer: titleContainer, 
+																	container: container, 
+																	id: id 
+																}
+															});
+				window.dispatchEvent(evt);
+			}
         }
 
         /**
@@ -1307,7 +1500,7 @@ if (typeof brutusin === "undefined") {
 
         function cleanSchemaMap(schemaId) {
             for (var prop in schemaMap) {
-                if (schemaId.startsWith(prop)) {
+                if (prop.startsWith(schemaId)) {
                     delete schemaMap[prop];
                 }
             }

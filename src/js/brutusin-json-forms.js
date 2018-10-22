@@ -439,7 +439,7 @@ if (typeof brutusin === "undefined") {
 
         };
 
-        renderers["object"] = function (container, id, parentObject, propertyProvider, value) {
+		renderers["object-default-layout"] = function (container, id, parentObject, propertyProvider, value) {
 
             function createStaticPropertyProvider(propname) {
                 var ret = new Object();
@@ -580,15 +580,98 @@ if (typeof brutusin === "undefined") {
                     var td2 = document.createElement("td");
                     td2.className = "prop-value";
 
-                    appendChild(tbody, tr, propSchema);
-                    appendChild(tr, td1, propSchema);
-                    appendChild(tr, td2, propSchema);
-                    var pp = createStaticPropertyProvider(prop);
-                    var propInitialValue = null;
-                    if (value) {
-                        propInitialValue = value[prop];
-                    }
-                    render(td1, td2, propId, current, pp, propInitialValue);
+					if(	propSchema.container ) {
+						
+						td1.className = "prop";
+						td1.colSpan = 2;
+						
+						appendChild(tbody, tr, propSchema);
+						appendChild(tr, td1, propSchema);
+						
+						
+						var wrapContainer = null;
+						var wrapContainerHeader = null;
+						var wrapContainerTitle = null;
+						var wrapContainerBody = null;
+						var wrapContainerToggle = null;
+						
+						if(propSchema.container === "fieldset") {
+							
+							wrapContainer = document.createElement("fieldset");
+							wrapContainerHeader = document.createElement("legend");
+							wrapContainerTitle = document.createElement("span");
+							wrapContainerBody = document.createElement("div");
+							wrapContainerToggle = document.createElement("button");
+						
+							wrapContainer.className = "property-container";
+							wrapContainerHeader.className = "property-header";
+							wrapContainerTitle.className = "property-title";
+							wrapContainerBody.className = "property-body";
+							wrapContainerToggle.className = "property-toggle";
+							
+						} else 
+						if(propSchema.container === "panel") {
+							
+							wrapContainer = document.createElement("div");
+							wrapContainerHeader = document.createElement("div");
+							wrapContainerTitle = document.createElement("span");
+							wrapContainerBody = document.createElement("div");
+							wrapContainerToggle = document.createElement("button");
+						
+							wrapContainer.className = "property-container";
+							wrapContainerHeader.className = "property-header";
+							wrapContainerTitle.className = "property-title";
+							wrapContainerBody.className = "property-body";
+							wrapContainerToggle.className = "property-toggle";
+							
+						} else {
+							
+							wrapContainer = document.createElement("div");
+							wrapContainerHeader = document.createElement("div");
+							wrapContainerTitle = document.createElement("span");
+							wrapContainerBody = document.createElement("div");
+							wrapContainerToggle = document.createElement("button");
+						
+							wrapContainer.className = "property-container";
+							wrapContainerHeader.className = "property-header";
+							wrapContainerTitle.className = "property-title";
+							wrapContainerBody.className = "property-body";
+							wrapContainerToggle.className = "property-toggle";
+							
+						}
+						
+						
+						appendChild(td1, wrapContainer, propSchema);
+						
+						if( propSchema.title ) {
+							appendChild(wrapContainerTitle, document.createTextNode(propSchema.title), propSchema);
+						}
+						appendChild(wrapContainerHeader, wrapContainerTitle, propSchema);
+						appendChild(wrapContainerHeader, wrapContainerToggle, propSchema);
+						appendChild(wrapContainerToggle, document.createTextNode("+-"), propSchema);
+						
+						appendChild(wrapContainer, wrapContainerHeader, propSchema);
+						appendChild(wrapContainer, wrapContainerBody, propSchema);
+						
+						
+						
+						var pp = createStaticPropertyProvider(prop);
+						var propInitialValue = null;
+						if (value) {
+							propInitialValue = value[prop];
+						}
+						render(wrapContainerTitle, wrapContainerBody, propId, current, pp, propInitialValue);
+					} else {
+						appendChild(tbody, tr, propSchema);
+						appendChild(tr, td1, propSchema);
+						appendChild(tr, td2, propSchema);
+						var pp = createStaticPropertyProvider(prop);
+						var propInitialValue = null;
+						if (value) {
+							propInitialValue = value[prop];
+						}
+						render(td1, td2, propId, current, pp, propInitialValue);
+					}
                 }
             }
             var usedProps = [];
@@ -680,7 +763,321 @@ if (typeof brutusin === "undefined") {
                 appendChild(container, table, s);
             }
         };
+        // end of object-default-layout
+		renderers["object-tab-layout"] = function (container, id, parentObject, propertyProvider, value) {
+
+            function createStaticPropertyProvider(propname) {
+                var ret = new Object();
+                ret.getValue = function () {
+                    return propname;
+                };
+                ret.onchange = function (oldName) {
+                };
+                return ret;
+            }
+
+            function addAdditionalProperty(current, table, id, name, value, pattern) {
+                var schemaId = getSchemaId(id);
+                var s = getSchema(schemaId);
+                var tbody = table.tBodies[0];
+                var tr = document.createElement("tr");
+                var td1 = document.createElement("td");
+                td1.className = "add-prop-name";
+                var innerTab = document.createElement("table");
+                var innerTr = document.createElement("tr");
+                var innerTd1 = document.createElement("td");
+                var innerTd2 = document.createElement("td");
+                var keyForBlank = "$" + Object.keys(current).length + "$";
+                var td2 = document.createElement("td");
+                td2.className = "prop-value";
+                var nameInput = document.createElement("input");
+                nameInput.type = "text";
+                var regExp;
+                if (pattern) {
+                    regExp = RegExp(pattern);
+                }
+                nameInput.getValidationError = function () {
+                    if (nameInput.previousValue !== nameInput.value) {
+                        if (current.hasOwnProperty(nameInput.value)) {
+                            return BrutusinForms.messages["addpropNameExistent"];
+                        }
+                    }
+                    if (!nameInput.value) {
+                        return BrutusinForms.messages["addpropNameRequired"];
+                    }
+                };
+                var pp = createPropertyProvider(
+                        function () {
+                            if (nameInput.value) {
+                                if (regExp) {
+                                    if (nameInput.value.search(regExp) !== -1) {
+                                        return nameInput.value;
+                                    }
+                                } else {
+                                    return nameInput.value;
+                                }
+                            }
+                            return keyForBlank;
+                        },
+                        function (oldPropertyName) {
+                            if (pp.getValue() === oldPropertyName) {
+                                return;
+                            }
+                            if (!oldPropertyName || !current.hasOwnProperty(oldPropertyName)) {
+                                oldPropertyName = keyForBlank;
+                            }
+                            if (current.hasOwnProperty(oldPropertyName) || regExp && pp.getValue().search(regExp) === -1) {
+                                current[pp.getValue()] = current[oldPropertyName];
+                                delete current[oldPropertyName];
+                            }
+                        });
+
+                nameInput.onblur = function () {
+                    if (nameInput.previousValue !== nameInput.value) {
+                        var name = nameInput.value;
+                        var i = 1;
+                        while (nameInput.previousValue !== name && current.hasOwnProperty(name)) {
+                            name = nameInput.value + "(" + i + ")";
+                            i++;
+                        }
+                        nameInput.value = name;
+                        pp.onchange(nameInput.previousValue);
+                        nameInput.previousValue = nameInput.value;
+                        return;
+                    }
+                };
+                var removeButton = document.createElement("button");
+                removeButton.setAttribute('type', 'button');
+                removeButton.className = "remove";
+                appendChild(removeButton, document.createTextNode("x"), s);
+                removeButton.onclick = function () {
+                    delete current[nameInput.value];
+                    table.deleteRow(tr.rowIndex);
+                    nameInput.value = null;
+                    pp.onchange(nameInput.previousValue);
+                };
+                appendChild(innerTd1, nameInput, s);
+                appendChild(innerTd2, removeButton, s);
+                appendChild(innerTr, innerTd1, s);
+                appendChild(innerTr, innerTd2, s);
+                appendChild(innerTab, innerTr, s);
+                appendChild(td1, innerTab, s);
+
+                if (pattern !== undefined) {
+                    nameInput.placeholder = pattern;
+                }
+
+                appendChild(tr, td1, s);
+                appendChild(tr, td2, s);
+                appendChild(tbody, tr, s);
+                appendChild(table, tbody, s);
+                render(null, td2, id, current, pp, value);
+
+                if (name) {
+                    nameInput.value = name;
+                    nameInput.onblur();
+                }
+            }
+
+            var schemaId = getSchemaId(id);
+            var s = getSchema(schemaId);
+            var current = new Object();
+            if (!parentObject) {
+                data = current;
+            } else {
+                if (propertyProvider.getValue() || propertyProvider.getValue() === 0) {
+                    parentObject[propertyProvider.getValue()] = current;
+                }
+            }
+			
+			
+			
+            var table = document.createElement("div");
+            table.className = "object tabs";
+			
+			var tabUL = document.createElement("ul");
+			var tabNavigation = document.createElement("nav");
+			var tabContentContainer = document.createElement("div");
+			
+			tabNavigation.className="tab-navigation";
+			tabContentContainer.className="tab-content-container content-wrap";
+			
+			appendChild(tabNavigation, tabUL, s);
+            appendChild(table, tabNavigation, s);
+            appendChild(table, tabContentContainer, s);
+			
+            var propNum = 0;
+			var propCnt = 0;
+			var defaultTabButton = null;
+            if (s.hasOwnProperty("properties")) {
+                propNum = s.properties.length;
+                for (var prop in s.properties) {
+					
+					propCnt++;
+					
+                    var propId = id + "." + prop;
+                    var propSchema = getSchema(getSchemaId(propId));
+					
+					var tabButton = document.createElement("li");
+					var tabLink = document.createElement("a");
+					//var tabButton = document.createElement("button");
+					tabButton.className = "tab-button";
+					$(tabButton).attr("tabname", "tab-" + propCnt);
+					appendChild(tabUL, tabButton, propSchema);
+					appendChild(tabButton, tabLink, propSchema);
+					
+					var tabContent = document.createElement("div");
+                    tabContent.className = "tab-content prop-value";
+					$(tabContent).attr("tabname", "tab-" + propCnt);
+					appendChild(tabContentContainer, tabContent, propSchema);
+					
+					tabButton.onclick = function () {
+						var $tabNavigation = $(this).closest(".tab-navigation");
+						var $tabButtonContainer = $tabNavigation.children("ul");
+						var $tabContentContainer = $tabNavigation.parent().children(".tab-content-container");
+						var targetTabName = $(this).attr("tabname");
+						
+						$tabButtonContainer.find(".tab-button").removeClass("tab-current");
+						$tabContentContainer.children(".tab-content-container").hide();
+						
+						$tabButtonContainer.children("[tabname="+targetTabName+"]").addClass("tab-current");
+						$tabContentContainer.children(".tab-content").hide();
+						$tabContentContainer.children("[tabname="+targetTabName+"]").show();
+					};
+					
+					
+					if(!defaultTabButton) {
+						defaultTabButton = tabButton;
+					}
+					
+					if(s.defaultTab) {
+						if(s.defaultTab === prop) {
+							defaultTabButton = tabButton;
+						}
+					} 
+					
+
+					{
+						var pp = createStaticPropertyProvider(prop);
+						var propInitialValue = null;
+						if (value) {
+							propInitialValue = value[prop];
+						}
+						render(tabLink, tabContent, propId, current, pp, propInitialValue);
+					}
+                }
+            }
+			defaultTabButton.click();
+			
+            var usedProps = [];
+            if (s.patternProperties || s.additionalProperties) {
+                var div = document.createElement("div");
+                appendChild(div, table, s);
+                if (s.patternProperties) {
+                    for (var pattern in s.patternProperties) {
+                        var patProps = s.patternProperties[pattern];
+                        var patdiv = document.createElement("div");
+                        patdiv.className = "add-pattern-div";
+                        var addButton = document.createElement("button");
+                        addButton.setAttribute('type', 'button');
+                        addButton.pattern = pattern;
+                        addButton.id = id + "[" + pattern + "]";
+                        addButton.onclick = function () {
+                            addAdditionalProperty(current, table, this.id, undefined, undefined, this.pattern);
+                        };
+                        if (s.maxProperties || s.minProperties) {
+                            addButton.getValidationError = function () {
+                                if (s.minProperties && propNum + table.rows.length < s.minProperties) {
+                                    return BrutusinForms.messages["minProperties"].format(s.minProperties);
+                                }
+                                if (s.maxProperties && propNum + table.rows.length > s.maxProperties) {
+                                    return BrutusinForms.messages["maxProperties"].format(s.maxProperties);
+                                }
+                            };
+                        }
+                        if (patProps.description) {
+                            addButton.title = patProps.description;
+                        }
+                        appendChild(addButton, document.createTextNode("Add " + pattern), s);
+                        appendChild(patdiv, addButton, s);
+                        if (value) {
+                            for (var p in value) {
+                                if (s.properties && s.properties.hasOwnProperty(p)) {
+                                    continue;
+                                }
+                                var r = RegExp(pattern);
+                                if (p.search(r) === -1) {
+                                    continue;
+                                }
+                                if (usedProps.indexOf(p) !== -1) {
+                                    continue;
+                                }
+                                addAdditionalProperty(current, table, id + "[" + pattern + "]", p, value[p], pattern);
+                                usedProps.push(p);
+                            }
+                        }
+                        appendChild(div, patdiv, s);
+                    }
+                }
+                if (s.additionalProperties) {
+                    var addPropS = getSchema(s.additionalProperties);
+                    var addButton = document.createElement("button");
+                    addButton.setAttribute('type', 'button');
+                    addButton.onclick = function () {
+                        addAdditionalProperty(current, table, id + "[*]", undefined);
+                    };
+                    if (s.maxProperties || s.minProperties) {
+                        addButton.getValidationError = function () {
+                            if (s.minProperties && propNum + table.rows.length < s.minProperties) {
+                                return BrutusinForms.messages["minProperties"].format(s.minProperties);
+                            }
+                            if (s.maxProperties && propNum + table.rows.length > s.maxProperties) {
+                                return BrutusinForms.messages["maxProperties"].format(s.maxProperties);
+                            }
+                        };
+                    }
+                    if (addPropS.description) {
+                        addButton.title = addPropS.description;
+                    }
+                    appendChild(addButton, document.createTextNode("Add"), s);
+                    appendChild(div, addButton, s);
+                    if (value) {
+                        for (var p in value) {
+                            if (s.properties && s.properties.hasOwnProperty(p)) {
+                                continue;
+                            }
+                            if (usedProps.indexOf(p) !== -1) {
+                                continue;
+                            }
+                            addAdditionalProperty(current, table, id + "[\"" + prop + "\"]", p, value[p]);
+                        }
+                    }
+                }
+                appendChild(container, div, s);
+            } else {
+                appendChild(container, table, s);
+            }
+        };
+        // end of object-tab-layout
+		
+		renderers["object"] = function (container, id, parentObject, propertyProvider, value) {
+			var schemaId = getSchemaId(id);
+            var s = getSchema(schemaId);
+			
+			if(s.format) {
+				var array_format_key = "object-"+s.format+"-layout";
+				if(renderers[array_format_key]) {
+					renderers[array_format_key](container, id, parentObject, propertyProvider, value);
+				} else {
+					console.error("Unsupport object format ["+s.format+"], use default format for object renderer.");
+					renderers["object-default-layout"](container, id, parentObject, propertyProvider, value);
+				}
+			} else {
+				renderers["object-default-layout"](container, id, parentObject, propertyProvider, value);
+			}
+        };
         // end of object renderer
+			
 		renderers["array-default-layout"] = function (container, id, parentObject, propertyProvider, value) {
             function addItem(current, table, id, value, readOnly) {
                 var schemaId = getSchemaId(id);
@@ -1368,6 +1765,10 @@ if (typeof brutusin === "undefined") {
             //console.log(id,s,value);
             var r = renderers[s.type];
             if (r && !s.dependsOn) {
+				if(s.titleClass) {
+					$(titleContainer).addClass(s.titleClass);
+				}
+				
                 if (s.title) {
                     renderTitle(titleContainer, s.title, s);
                 } else if (propertyProvider) {

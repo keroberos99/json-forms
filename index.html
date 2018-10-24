@@ -10,13 +10,12 @@
 		<!-- <link rel="stylesheet" href="https://tympanus.net/Development/TabStylesInspiration/css/tabstyles.css"> -->
 		
 		<link rel="stylesheet" href='css/decorate.css'  crossorigin="anonymous"/>
-		<link rel="stylesheet" href='//cdn.jsdelivr.net/gh/keroberos99/json-forms@66e97fb714f04603ad802bb09297f6177a08885b/dist/css/brutusin-json-forms.min.css'/>
+		<link rel="stylesheet" href='//cdn.jsdelivr.net/gh/keroberos99/json-forms@a21051984736b13603517a64346d1169fc091e53/dist/css/brutusin-json-forms.min.css'/>
 		
-		<!-- <link rel="stylesheet" href='/rawgit.com/keroberos99/json-forms/master/dist/css/decorate.css'/> -->
-        <!-- <link rel="stylesheet" href='/rawgit.com/keroberos99/json-forms/master/dist/css/brutusin-json-forms.min.css'/> -->
-		
-		<!-- <link rel="stylesheet" href='//cdn.jsdelivr.net/gh/keroberos99/json-forms@66e97fb714f04603ad802bb09297f6177a08885b/dist/css/decorate.css'/> -->
-		<!-- <link rel="stylesheet" href='//cdn.jsdelivr.net/gh/keroberos99/json-forms@66e97fb714f04603ad802bb09297f6177a08885b/dist/css/brutusin-json-forms.min.css'/> -->
+        <!-- 
+		<link rel="stylesheet" href='/rawgit.com/keroberos99/json-forms/master/dist/css/brutusin-json-forms.min.css'/> 
+		<link rel="stylesheet" href='//cdn.jsdelivr.net/gh/keroberos99/json-forms@a21051984736b13603517a64346d1169fc091e53/dist/css/brutusin-json-forms.min.css'/> 
+		-->
 		
 		
 
@@ -38,15 +37,15 @@
         <script src="lib/bootstrap-select/js/bootstrap-select.min.js"></script>
         <script src="lib/bootstrap-select/js/i18n/defaults-en_US.min.js"></script>
 		
-        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@66e97fb714f04603ad802bb09297f6177a08885b/dist/js/brutusin-json-forms.js"></script>
-        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@66e97fb714f04603ad802bb09297f6177a08885b/dist/js/brutusin-json-forms-bootstrap.min.js"></script>
+        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@a21051984736b13603517a64346d1169fc091e53/dist/js/brutusin-json-forms.js"></script>
+        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@a21051984736b13603517a64346d1169fc091e53/dist/js/brutusin-json-forms-bootstrap.min.js"></script>
 		<!--
         <script src="/rawgit.com/keroberos99/json-forms/master/dist/js/brutusin-json-forms.js"></script>
         <script src="/rawgit.com/keroberos99/json-forms/master/dist/js/brutusin-json-forms-bootstrap.min.js"></script>
 		-->
 		<!--
-        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@66e97fb714f04603ad802bb09297f6177a08885b/dist/js/brutusin-json-forms.js"></script>
-        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@66e97fb714f04603ad802bb09297f6177a08885b/dist/js/brutusin-json-forms-bootstrap.min.js"></script>
+        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@a21051984736b13603517a64346d1169fc091e53/dist/js/brutusin-json-forms.js"></script>
+        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@a21051984736b13603517a64346d1169fc091e53/dist/js/brutusin-json-forms-bootstrap.min.js"></script>
 		-->
 		
 		
@@ -74,8 +73,13 @@
                     null,
                     null,
                     "Example by Keroberos99"],
-				["Tab layout",
+				["Tab with nested structure",
                     {"$schema":"http://json-schema.org/draft-03/schema#","definitions":{"person":{"$id":"#person","type":"object","properties":{"name":{"type":"string","default":"default name"},"age":{"type":"number"},"date_of_birth":{"type":"string","label":"Date of birth","default":"1970-01-01"}},"required":["street_address","city","state"]},"person2":{"type":"object","properties":{"name2":{"type":"string","default":"default name"},"age2":{"type":"number"},"date_of_birth2":{"type":"string","format":"date","label":"Date of birth 2","default":"1970-01-01"}},"required":["street_address","city","state"]}},"type":"object","format":"tab","styleClass":"tabs-style-flip","properties":{"sample1":{"titleClass":"icon icon-box","type":"string"},"sample2":{"type":"string","readOnly":true},"sampleObj":{"type":"object","titleClass":"icon icon-tools","title":"Sample Obj","container":"panel","properties":{"prop1":{"type":"string"},"prop2":{"type":"string"}}},"array-table-layout":{"type":"array","format":"table","items":{"$ref":"#/definitions/person"}},"array-readonly":{"type":"array","items":{"type":"string"},"readOnly":true},"array-default-layout":{"type":"array","items":{"$ref":"#/definitions/person2"}},"sub-level-tab":{"type":"object","format":"tab","properties":{"sub1":{"type":"object","properties":{"prop1":{"type":"string"},"prop2":{"type":"string"}}},"sub2":{"type":"string"},"sub3":{"type":"string"}}}}},
+                    null,
+                    null,
+                    "Example by Keroberos99"],
+				["Tab layout with icon",
+                    {"$schema":"http://json-schema.org/draft-03/schema#","type":"object","format":"tab","styleClass":"tabs-style-iconbox","properties":{"home":{"titleClass":"icon icon-home","type":"object","properties":{"field1":{"title":"Home field","type":"string"},"field2":{"type":"number"}}},"deal":{"titleClass":"icon icon-gift","type":"object","properties":{"field1":{"title":"Gift name","type":"string"},"field2":{"title":"Gift code","type":"number"}}},"upload":{"titleClass":"icon icon-upload","type":"object","properties":{"field1":{"title":"Content to sell","type":"string"},"field2":{"title":"Price of content","type":"number"}}},"Work":{"titleClass":"icon icon-coffee","type":"object","properties":{"field1":{"title":"Which place to go","type":"string"},"field2":{"title":"Why you choose there?","type":"string"}}},"Settings":{"titleClass":"icon icon-config","type":"object","properties":{"field1":{"title":"Setting label","type":"string"},"field2":{"title":"Setting value","type":"string"}}}}},
                     null,
                     null,
                     "Example by Keroberos99"],

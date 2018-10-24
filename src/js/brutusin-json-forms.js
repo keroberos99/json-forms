@@ -1375,9 +1375,9 @@ if (typeof brutusin === "undefined") {
                     removeButton.disabled = true;
                 appendChild(removeButton, document.createTextNode("x"), s);
                 var computRowCount = function () {
-                    for (var i = 0; i < table.rows.length; i++) {
+                    for (var i = 1; i < table.rows.length; i++) {
                         var row = table.rows[i];
-                        row.cells[0].innerHTML = i + 1;
+                        row.cells[0].innerHTML = i;
                     }
                 };
                 removeButton.onclick = function () {
@@ -1911,8 +1911,12 @@ if (typeof brutusin === "undefined") {
             renderInfoMap[schemaId].propertyProvider = propertyProvider;
             renderInfoMap[schemaId].value = value;
 			
-            //clear(titleContainer);
-            //clear(container);
+			if(s.format && s.format==="tablerow") {
+				//Skip to avoid remove td.
+			} else {
+				clear(titleContainer);
+				clear(container);
+			}
 			
             //console.log(id,s,value);
             var r = renderers[s.type];

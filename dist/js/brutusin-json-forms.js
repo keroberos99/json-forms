@@ -901,6 +901,9 @@ if (typeof brutusin === "undefined") {
 			
 			tabNavigation.className="tab-navigation";
 			tabContentContainer.className="tab-content-container content-wrap";
+			if(s.styleClass) {
+				$(table).addClass(s.styleClass);
+			}
 			
 			appendChild(tabNavigation, tabUL, s);
             appendChild(table, tabNavigation, s);

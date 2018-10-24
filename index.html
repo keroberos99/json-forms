@@ -9,14 +9,14 @@
         <link rel="stylesheet" href="lib/octicons/octicons.css">
 		<!-- <link rel="stylesheet" href="https://tympanus.net/Development/TabStylesInspiration/css/tabstyles.css"> -->
 		
-		<link rel="stylesheet" href='//cdn.jsdelivr.net/gh/keroberos99/json-forms@aad6ec4b8cc43bc590342e11142e3300a8e1f897/dist/css/decorate.css'/>
-		<link rel="stylesheet" href='//cdn.jsdelivr.net/gh/keroberos99/json-forms@aad6ec4b8cc43bc590342e11142e3300a8e1f897/dist/css/brutusin-json-forms.min.css'/>
+		<link rel="stylesheet" href='css/decorate.css'  crossorigin="anonymous"/>
+		<link rel="stylesheet" href='//cdn.jsdelivr.net/gh/keroberos99/json-forms@66e97fb714f04603ad802bb09297f6177a08885b/dist/css/brutusin-json-forms.min.css'/>
 		
 		<!-- <link rel="stylesheet" href='/rawgit.com/keroberos99/json-forms/master/dist/css/decorate.css'/> -->
         <!-- <link rel="stylesheet" href='/rawgit.com/keroberos99/json-forms/master/dist/css/brutusin-json-forms.min.css'/> -->
 		
-		<!-- <link rel="stylesheet" href='//cdn.jsdelivr.net/gh/keroberos99/json-forms@fd0f3c3ad943e0ed00299435ddebad40a8355047/dist/css/decorate.css'/> -->
-		<!-- <link rel="stylesheet" href='//cdn.jsdelivr.net/gh/keroberos99/json-forms@fd0f3c3ad943e0ed00299435ddebad40a8355047/dist/css/brutusin-json-forms.min.css'/> -->
+		<!-- <link rel="stylesheet" href='//cdn.jsdelivr.net/gh/keroberos99/json-forms@66e97fb714f04603ad802bb09297f6177a08885b/dist/css/decorate.css'/> -->
+		<!-- <link rel="stylesheet" href='//cdn.jsdelivr.net/gh/keroberos99/json-forms@66e97fb714f04603ad802bb09297f6177a08885b/dist/css/brutusin-json-forms.min.css'/> -->
 		
 		
 
@@ -38,16 +38,17 @@
         <script src="lib/bootstrap-select/js/bootstrap-select.min.js"></script>
         <script src="lib/bootstrap-select/js/i18n/defaults-en_US.min.js"></script>
 		
-		<script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@aad6ec4b8cc43bc590342e11142e3300a8e1f897/dist/js/brutusin-json-forms.js"></script>
-        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@aad6ec4b8cc43bc590342e11142e3300a8e1f897/dist/js/brutusin-json-forms-bootstrap.min.js"></script>
+        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@66e97fb714f04603ad802bb09297f6177a08885b/dist/js/brutusin-json-forms.js"></script>
+        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@66e97fb714f04603ad802bb09297f6177a08885b/dist/js/brutusin-json-forms-bootstrap.min.js"></script>
 		<!--
         <script src="/rawgit.com/keroberos99/json-forms/master/dist/js/brutusin-json-forms.js"></script>
         <script src="/rawgit.com/keroberos99/json-forms/master/dist/js/brutusin-json-forms-bootstrap.min.js"></script>
 		-->
 		<!--
-        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@aad6ec4b8cc43bc590342e11142e3300a8e1f897/dist/js/brutusin-json-forms.js"></script>
-        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@aad6ec4b8cc43bc590342e11142e3300a8e1f897/dist/js/brutusin-json-forms-bootstrap.min.js"></script>
+        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@66e97fb714f04603ad802bb09297f6177a08885b/dist/js/brutusin-json-forms.js"></script>
+        <script src="//cdn.jsdelivr.net/gh/keroberos99/json-forms@66e97fb714f04603ad802bb09297f6177a08885b/dist/js/brutusin-json-forms-bootstrap.min.js"></script>
 		-->
+		
 		
         <script lang="javascript">
             var BrutusinForms = brutusin["json-forms"];
@@ -68,13 +69,18 @@
                     null,
                     "function (names, data, cb) {\r\n    var schemas = new Object();\r\n    var schema = new Object();\r\n  \r\n  \t\/\/This block can be replaced to ask schema from server instead.\r\n  \t\/\/[begin]\r\n  \r\n  \tif(names[0] === \"$.character.artifact\") {\r\n      if(data.character.ability === \"heal\") {\r\n        schema.type = \"string\";\r\n        schema.title = \"Heal Artifact\";\r\n        schema.enum = [\"wand\", \"orb\", \"medic kit\"];\r\n      } else \r\n      if(data.character.ability === \"agile\") {\r\n        schema.type = \"string\";\r\n        schema.title = \"Boot Artifact\";\r\n        schema.enum = [\"nike\", \"ardidas\", \"bata\"];\r\n      } else {\r\n      \tschema.type = null;\t\/\/No support artifact\r\n      }\r\n      schemas[names] = schema;\r\n    }\r\n  \r\n  \tif(names[0] === \"$.character.weapon\") {\r\n      if(data.character.career === \"mage\") {\r\n        schema.type = \"string\";\r\n        schema.title = \"Magic Weapon\";\r\n        schema.enum = [\"fire-wand\", \"ice-wand\", \"spark-wand\"];\r\n      } else \r\n      if(data.character.career === \"kight\") {\r\n        schema.type = \"string\";\r\n        schema.title = \"Night Weapon\";\r\n        schema.enum = [\"crystal-sword\", \"ruby-dagger\", \"emeral-dagger\"];\r\n      } else \r\n      if(data.character.career === \"archer\") {\r\n        schema.type = \"string\";\r\n        schema.title = \"Archer Weapon\";\r\n        schema.enum = [\"Vampire-Bow\", \"Light-Bow\", \"Soul-Bow\"];\r\n      } else {\r\n      \tschema.type = null;\t\/\/No support artifact\r\n      }\r\n      schemas[names] = schema;\r\n    }\r\n  \t\/\/[end]\r\n  \r\n  \t\/\/cb(schemas);\r\n    setTimeout(function(){cb(schemas)},500); \/\/ in order to show asynchrony\r\n}",
                     "Example of [dynamic schemas](https://github.com/brutusin/json-forms#dynamic-schemas) in action. Notice the usage of `dependsOn` (*Schema* tab), and the specific implementation of `bf.schemaResolver` (*Schema resolver* tab). See a real application of this feature at [http://demo.rpc.brutusin.org/rpc/repo/#http-services/logo](http://demo.rpc.brutusin.org/rpc/repo/#http-services/logo)"],
-				["Custom schemas",
+				["Array table layout",
                     {"$schema":"http://json-schema.org/draft-03/schema#","definitions":{"person":{"$id":"#person","type":"object","properties":{"name":{"type":"string","default":"default name"},"age":{"type":"number"},"date_of_birth":{"type":"string","label":"Date of birth","default":"1970-01-01"}},"required":["street_address","city","state"]},"person2":{"type":"object","properties":{"name2":{"type":"string","default":"default name"},"age2":{"type":"number"},"date_of_birth2":{"type":"string","format":"date","label":"Date of birth 2","default":"1970-01-01"}},"required":["street_address","city","state"]}},"type":"object","properties":{"sample1":{"type":"string"},"sample2":{"type":"string","readOnly":true},"array-table-layout":{"type":"array","format":"table","items":{"$ref":"#/definitions/person"}},"array-readonly":{"type":"array","items":{"type":"string"},"readOnly":true},"array-default-layout":{"type":"array","items":{"$ref":"#/definitions/person2"}}}},
                     null,
                     null,
                     "Example by Keroberos99"],
-				["Custom schemas tab",
-                    {"$schema":"http://json-schema.org/draft-03/schema#","definitions":{"person":{"$id":"#person","type":"object","properties":{"name":{"type":"string","default":"default name"},"age":{"type":"number"},"date_of_birth":{"type":"string","label":"Date of birth","default":"1970-01-01"}},"required":["street_address","city","state"]},"person2":{"type":"object","properties":{"name2":{"type":"string","default":"default name"},"age2":{"type":"number"},"date_of_birth2":{"type":"string","format":"date","label":"Date of birth 2","default":"1970-01-01"}},"required":["street_address","city","state"]}},"type":"object","format":"tab","properties":{"sample1":{"type":"string"},"sample2":{"type":"string","readOnly":true},"sampleObj":{"type":"object","title":"Sample Obj","container":"panel","properties":{"prop1":{"type":"string"},"prop2":{"type":"string"}}},"array-table-layout":{"type":"array","format":"table","items":{"$ref":"#/definitions/person"}},"array-readonly":{"type":"array","items":{"type":"string"},"readOnly":true},"array-default-layout":{"type":"array","items":{"$ref":"#/definitions/person2"}}}},
+				["Tab layout",
+                    {"$schema":"http://json-schema.org/draft-03/schema#","definitions":{"person":{"$id":"#person","type":"object","properties":{"name":{"type":"string","default":"default name"},"age":{"type":"number"},"date_of_birth":{"type":"string","label":"Date of birth","default":"1970-01-01"}},"required":["street_address","city","state"]},"person2":{"type":"object","properties":{"name2":{"type":"string","default":"default name"},"age2":{"type":"number"},"date_of_birth2":{"type":"string","format":"date","label":"Date of birth 2","default":"1970-01-01"}},"required":["street_address","city","state"]}},"type":"object","format":"tab","styleClass":"tabs-style-flip","properties":{"sample1":{"titleClass":"icon icon-box","type":"string"},"sample2":{"type":"string","readOnly":true},"sampleObj":{"type":"object","titleClass":"icon icon-tools","title":"Sample Obj","container":"panel","properties":{"prop1":{"type":"string"},"prop2":{"type":"string"}}},"array-table-layout":{"type":"array","format":"table","items":{"$ref":"#/definitions/person"}},"array-readonly":{"type":"array","items":{"type":"string"},"readOnly":true},"array-default-layout":{"type":"array","items":{"$ref":"#/definitions/person2"}},"sub-level-tab":{"type":"object","format":"tab","properties":{"sub1":{"type":"object","properties":{"prop1":{"type":"string"},"prop2":{"type":"string"}}},"sub2":{"type":"string"},"sub3":{"type":"string"}}}}},
+                    null,
+                    null,
+                    "Example by Keroberos99"],
+				["Rendering Container",
+                    {"$schema":"http://json-schema.org/draft-03/schema#","definitions":{"person":{"$id":"#person","type":"object","properties":{"name":{"type":"string","default":"default name"},"age":{"type":"number"},"date_of_birth":{"type":"string","label":"Date of birth","default":"1970-01-01"}},"required":["street_address","city","state"]},"person2":{"type":"object","properties":{"name2":{"type":"string","default":"default name"},"age2":{"type":"number"},"date_of_birth2":{"type":"string","format":"date","label":"Date of birth 2","default":"1970-01-01"}},"required":["street_address","city","state"]}},"type":"object","properties":{"prop1":{"container":"div","type":"string"},"prop2":{"container":"panel","type":"string","readOnly":true},"prop3":{"container":"fieldset","type":"array","format":"table","items":{"$ref":"#/definitions/person"}},"array-readonly":{"type":"array","items":{"type":"string"},"readOnly":true},"array-default-layout":{"type":"array","items":{"$ref":"#/definitions/person2"}}}},
                     null,
                     null,
                     "Example by Keroberos99"],
